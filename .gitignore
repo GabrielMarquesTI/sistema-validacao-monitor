@@ -1,0 +1,28 @@
+# =========================
+# Backend (FastAPI / Python)
+# =========================
+backend/venv/
+backend/__pycache__/
+backend/**/*.pyc
+backend/*.db
+backend/alembic/versions/__pycache__/
+
+# =========================
+# Frontend (React / Vite)
+# =========================
+frontend/node_modules/
+frontend/dist/
+
+# =========================
+# Environment variables
+# =========================
+.env
+.env.*
+*.env
+
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+.vscode/
+.idea/

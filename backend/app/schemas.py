@@ -1,0 +1,69 @@
+from pydantic import BaseModel
+from typing import List, Optional
+
+
+# -------- TIPOS DE DISPOSITIVO --------
+
+class TipoDispositivoBase(BaseModel):
+    nome: str
+
+
+class TipoDispositivoCreate(TipoDispositivoBase):
+    pass
+
+
+class TipoDispositivoResponse(TipoDispositivoBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# -------- MARCAS --------
+
+class MarcaBase(BaseModel):
+    nome: str
+
+
+class MarcaCreate(MarcaBase):
+    pass
+
+
+class MarcaResponse(MarcaBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# -------- MODELOS --------
+
+class ModeloBase(BaseModel):
+    nome: str
+    tamanho_polegadas: Optional[float] = None
+    tipo_id: int
+    marca_id: int
+
+
+class ModeloCreate(ModeloBase):
+    pass
+
+
+class ModeloResponse(ModeloBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# ----- ADMIN VIEW -------
+
+class ModeloAdminResponse(BaseModel):
+    id: int
+    modelo: str
+    marca: str
+    tipo: str
+    tamanho_polegadas: float | None
+
+    class Config:
+        from_attributes = True
