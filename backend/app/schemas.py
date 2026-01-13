@@ -67,3 +67,11 @@ class ModeloAdminResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+# ATUALIZAR DADOS
+
+class ModeloUpdate(BaseModel):
+    modelo: str
+    tipo_id: int
+    marca_id: int
+    tamanho_polegadas: float | None = None

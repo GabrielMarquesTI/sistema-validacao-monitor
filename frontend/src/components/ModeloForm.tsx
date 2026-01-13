@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { api } from "../api/api";
 
+const TIPO_MONITOR_ID = 1;
+
 interface Tipo {
   id: number;
   nome: string;
@@ -13,9 +15,15 @@ interface Marca {
 
 interface ModeloFormProps {
   onSuccess: () => void;
+  onCancel: () => void;
+  modeloParaEditar?: any | null;
 }
 
-export default function ModeloForm({ onSuccess }: ModeloFormProps) {
+export default function ModeloForm({
+  onSuccess,
+  onCancel,
+  modeloParaEditar,
+}: ModeloFormProps) {
   const [nome, setNome] = useState("");
   const [tipoId, setTipoId] = useState<number | undefined>();
   const [marcaId, setMarcaId] = useState<number | undefined>();
@@ -24,11 +32,23 @@ export default function ModeloForm({ onSuccess }: ModeloFormProps) {
   const [tipos, setTipos] = useState<Tipo[]>([]);
   const [marcas, setMarcas] = useState<Marca[]>([]);
 
-  // 🔹 Carrega tipos e marcas ao abrir a tela
+  const editando = Boolean(modeloParaEditar);
+
+  // 🔹 Carrega tipos e marcas
   useEffect(() => {
     carregarTipos();
     carregarMarcas();
   }, []);
+
+  // 🔹 Preenche formulário ao editar
+  useEffect(() => {
+    if (modeloParaEditar) {
+      setNome(modeloParaEditar.modelo);
+      setTipoId(modeloParaEditar.tipo_id);
+      setMarcaId(modeloParaEditar.marca_id);
+      setTamanho(modeloParaEditar.tamanho_polegadas ?? undefined);
+    }
+  }, [modeloParaEditar]);
 
   async function carregarTipos() {
     const res = await api.get("/tipos");
@@ -40,10 +60,7 @@ export default function ModeloForm({ onSuccess }: ModeloFormProps) {
     setMarcas(res.data);
   }
 
-  function tipoSelecionadoEhMonitor() {
-    const tipo = tipos.find((t) => t.id === tipoId);
-    return tipo?.nome.toLowerCase() === "monitor";
-  }
+  const ehMonitor = tipoId === TIPO_MONITOR_ID;
 
   async function salvar() {
     if (!nome || !tipoId || !marcaId) {
@@ -51,15 +68,40 @@ export default function ModeloForm({ onSuccess }: ModeloFormProps) {
       return;
     }
 
-    try {
-      await api.post("/modelos", {
-        nome,
-        tipo_id: tipoId,
-        marca_id: marcaId,
-        tamanho_polegadas: tipoSelecionadoEhMonitor() ? tamanho : null,
-      });
+    // ✅ tamanho final garantido
+    const tamanhoFinal = ehMonitor
+      ? Number(
+          tamanho !== undefined
+            ? tamanho
+            : modeloParaEditar?.tamanho_polegadas
+        )
+      : undefined;
 
-      // limpa formulário
+    if (ehMonitor && (!tamanhoFinal || Number.isNaN(tamanhoFinal))) {
+      alert("Informe o tamanho do monitor");
+      return;
+    }
+
+    // ✅ payload correto
+    const payload: any = {
+      modelo: nome,
+      tipo_id: tipoId,
+      marca_id: marcaId,
+    };
+
+    if (ehMonitor) {
+      payload.tamanho_polegadas = tamanhoFinal;
+    }
+
+    console.log("PAYLOAD >>>", payload);
+
+    try {
+      if (editando) {
+        await api.put(`/modelos/${modeloParaEditar.id}`, payload);
+      } else {
+        await api.post("/modelos", payload);
+      }
+
       setNome("");
       setTipoId(undefined);
       setMarcaId(undefined);
@@ -67,13 +109,21 @@ export default function ModeloForm({ onSuccess }: ModeloFormProps) {
 
       onSuccess();
     } catch (error: any) {
-      alert(error.response?.data?.detail || "Erro ao salvar modelo");
+      const data = error.response?.data;
+
+      alert(
+        typeof data?.detail === "string"
+          ? data.detail
+          : "Erro ao salvar modelo"
+      );
+
+      console.error("Erro ao salvar:", data || error);
     }
   }
 
   return (
     <div style={{ marginTop: 30 }}>
-      <h2>Cadastro de Modelo</h2>
+      <h2>{editando ? "Editar Modelo" : "Cadastro de Modelo"}</h2>
 
       <input
         placeholder="Nome do modelo"
@@ -109,7 +159,7 @@ export default function ModeloForm({ onSuccess }: ModeloFormProps) {
         ))}
       </select>
 
-      {tipoSelecionadoEhMonitor() && (
+      {ehMonitor && (
         <input
           type="number"
           placeholder="Tamanho (polegadas)"
@@ -120,7 +170,17 @@ export default function ModeloForm({ onSuccess }: ModeloFormProps) {
         />
       )}
 
-      <button onClick={salvar}>Salvar</button>
+      <div style={{ marginTop: 10 }}>
+        <button onClick={salvar}>
+          {editando ? "Atualizar" : "Salvar"}
+        </button>
+
+        {editando && (
+          <button onClick={onCancel} style={{ marginLeft: 10 }}>
+            Cancelar
+          </button>
+        )}
+      </div>
     </div>
   );
 }

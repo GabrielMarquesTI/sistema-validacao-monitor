@@ -151,3 +151,49 @@ def list_marcas_admin(
         )
 
     return query.distinct().all()
+
+@app.put("/modelos/{modelo_id}", response_model=schemas.ModeloResponse)
+def update_modelo(
+    modelo_id: int,
+    modelo: schemas.ModeloUpdate,
+    db: Session = Depends(get_db)
+):
+    db_modelo = db.query(models.Modelo).filter(
+        models.Modelo.id == modelo_id
+    ).first()
+
+    if not db_modelo:
+        raise HTTPException(status_code=404, detail="Modelo não encontrado")
+
+    tipo = db.query(models.TipoDispositivo).filter(
+        models.TipoDispositivo.id == modelo.tipo_id
+    ).first()
+
+    if not tipo:
+        raise HTTPException(status_code=404, detail="Tipo não encontrado")
+
+    # 🔒 Validação condicional
+    if tipo.nome.lower() == "monitor":
+        if modelo.tamanho_polegadas is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Monitor exige o campo tamanho"
+            )
+
+    if tipo.nome.lower() == "celular":
+        if modelo.tamanho_polegadas is not None:
+            raise HTTPException(
+                status_code=400,
+                detail="Celular não deve possuir tamanho"
+            )
+
+    # 🔄 Atualização
+    db_modelo.nome = modelo.modelo
+    db_modelo.tipo_id = modelo.tipo_id
+    db_modelo.marca_id = modelo.marca_id
+    db_modelo.tamanho_polegadas = modelo.tamanho_polegadas
+
+    db.commit()
+    db.refresh(db_modelo)
+
+    return db_modelo

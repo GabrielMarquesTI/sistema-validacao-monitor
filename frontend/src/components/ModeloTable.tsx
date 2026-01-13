@@ -1,10 +1,11 @@
-import { type ModeloAdmin } from "../types";
+import {type ModeloAdmin } from "../types";
 
 interface ModeloTableProps {
   modelos: ModeloAdmin[];
+  onEdit: (modelo: ModeloAdmin) => void;
 }
 
-export default function ModeloTable({ modelos }: ModeloTableProps) {
+export default function ModeloTable({ modelos, onEdit }: ModeloTableProps) {
   return (
     <div style={{ marginTop: 20 }}>
       <h2>Tabela de Modelos</h2>
@@ -17,13 +18,14 @@ export default function ModeloTable({ modelos }: ModeloTableProps) {
             <th>Tipo</th>
             <th>Marca</th>
             <th>Tamanho</th>
+            <th>Ações</th>
           </tr>
         </thead>
 
         <tbody>
           {modelos.length === 0 ? (
             <tr>
-              <td colSpan={5} style={{ textAlign: "center" }}>
+              <td colSpan={6} style={{ textAlign: "center" }}>
                 Nenhum modelo encontrado
               </td>
             </tr>
@@ -35,6 +37,11 @@ export default function ModeloTable({ modelos }: ModeloTableProps) {
                 <td>{modelo.tipo}</td>
                 <td>{modelo.marca}</td>
                 <td>{modelo.tamanho_polegadas ?? "-"}</td>
+                <td>
+                  <button onClick={() => onEdit(modelo)}>
+                    Editar
+                  </button>
+                </td>
               </tr>
             ))
           )}
