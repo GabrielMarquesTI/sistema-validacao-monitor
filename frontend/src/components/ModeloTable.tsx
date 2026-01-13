@@ -3,10 +3,11 @@ import {type ModeloAdmin } from "../types";
 interface ModeloTableProps {
   modelos: ModeloAdmin[];
   onEdit: (modelo: ModeloAdmin) => void;
+  onDelete: (modelo: ModeloAdmin) => void,
 }
 
-export default function ModeloTable({ modelos, onEdit }: ModeloTableProps) {
-  return (
+export default function ModeloTable({ modelos, onEdit, onDelete }: ModeloTableProps) {
+    return (
     <div style={{ marginTop: 20 }}>
       <h2>Tabela de Modelos</h2>
 
@@ -41,6 +42,9 @@ export default function ModeloTable({ modelos, onEdit }: ModeloTableProps) {
                   <button onClick={() => onEdit(modelo)}>
                     Editar
                   </button>
+                  <button onClick={() => onDelete(modelo)}>
+                    Excluir
+                    </button>
                 </td>
               </tr>
             ))

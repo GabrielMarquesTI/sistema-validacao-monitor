@@ -4,6 +4,7 @@ from . import models, schemas
 from sqlalchemy.orm import Session
 from typing import List
 from fastapi.middleware.cors import CORSMiddleware
+from app.models import Modelo
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -14,7 +15,10 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # frontend Vite
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -87,15 +91,12 @@ def create_modelo(
     if tipo.nome.lower() == "celular":
         modelo.tamanho_polegadas = None
 
-    db_modelo = models.Modelo(**modelo.dict())
-    db.add(db_modelo)
-    db.commit()
-    db.refresh(db_modelo)
-
-    return db_modelo
-
-
-
+    db_modelo = models.Modelo(
+        nome=modelo.modelo,
+        tipo_id=modelo.tipo_id,
+        marca_id=modelo.marca_id,
+        tamanho_polegadas=modelo.tamanho_polegadas,
+    )
 
 @app.get("/modelos", response_model=List[schemas.ModeloResponse])
 def list_modelos(
@@ -197,3 +198,18 @@ def update_modelo(
     db.refresh(db_modelo)
 
     return db_modelo
+
+@app.delete("/modelos/{id}")
+def excluir_modelo(id: int, db: Session = Depends(get_db)):
+    modelo = db.query(Modelo).filter(Modelo.id == id).first()
+
+    if not modelo:
+        raise HTTPException(
+            status_code=404,
+            detail="Modelo não encontrado"
+        )
+
+    db.delete(modelo)
+    db.commit()
+
+    return {"message": "Modelo excluído com sucesso"}

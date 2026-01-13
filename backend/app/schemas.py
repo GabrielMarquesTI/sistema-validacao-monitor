@@ -39,14 +39,17 @@ class MarcaResponse(MarcaBase):
 # -------- MODELOS --------
 
 class ModeloBase(BaseModel):
-    nome: str
+    modelo: str
     tamanho_polegadas: Optional[float] = None
     tipo_id: int
     marca_id: int
 
 
-class ModeloCreate(ModeloBase):
-    pass
+class ModeloCreate(BaseModel):
+    modelo: str
+    tipo_id: int
+    marca_id: int
+    tamanho_polegadas: float | None = None
 
 
 class ModeloResponse(ModeloBase):

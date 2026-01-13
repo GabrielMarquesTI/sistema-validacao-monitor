@@ -7,7 +7,8 @@ import ModeloForm from "../components/ModeloForm";
 
 export default function AdminModelos() {
   const [modelos, setModelos] = useState<ModeloAdmin[]>([]);
-  const [modeloEditando, setModeloEditando] = useState<ModeloAdmin | null>(null);
+  const [modeloEditando, setModeloEditando] =
+    useState<ModeloAdmin | null>(null);
   const [refresh, setRefresh] = useState(false);
 
   async function carregarModelos(params?: any) {
@@ -27,6 +28,22 @@ export default function AdminModelos() {
     setModeloEditando(null);
   }
 
+  async function excluirModelo(modelo: ModeloAdmin) {
+    const confirmado = window.confirm(
+      `Deseja realmente excluir o modelo "${modelo.modelo}"?`
+    );
+
+    if (!confirmado) return;
+
+    try {
+      await api.delete(`/modelos/${modelo.id}`);
+      setRefresh(!refresh);
+    } catch (error) {
+      alert("Erro ao excluir modelo");
+      console.error(error);
+    }
+  }
+
   return (
     <div style={{ padding: 20 }}>
       <h1>Admin - Modelos</h1>
@@ -36,6 +53,7 @@ export default function AdminModelos() {
       <ModeloTable
         modelos={modelos}
         onEdit={editarModelo}
+        onDelete={excluirModelo}
       />
 
       <ModeloForm
