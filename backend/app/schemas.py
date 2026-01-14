@@ -5,7 +5,7 @@ from typing import List, Optional
 # -------- TIPOS DE DISPOSITIVO --------
 
 class TipoDispositivoBase(BaseModel):
-    nome: str
+    modelo: str
 
 
 class TipoDispositivoCreate(TipoDispositivoBase):
@@ -22,7 +22,7 @@ class TipoDispositivoResponse(TipoDispositivoBase):
 # -------- MARCAS --------
 
 class MarcaBase(BaseModel):
-    nome: str
+    modelo: str
 
 
 class MarcaCreate(MarcaBase):

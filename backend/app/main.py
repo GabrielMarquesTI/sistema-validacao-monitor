@@ -92,11 +92,18 @@ def create_modelo(
         modelo.tamanho_polegadas = None
 
     db_modelo = models.Modelo(
-        nome=modelo.modelo,
+        nome=modelo.modelo,   # 👈 tradução aqui
         tipo_id=modelo.tipo_id,
         marca_id=modelo.marca_id,
         tamanho_polegadas=modelo.tamanho_polegadas,
     )
+
+    db.add(db_modelo)
+    db.commit()
+    db.refresh(db_modelo)
+
+    return db_modelo
+
 
 @app.get("/modelos", response_model=List[schemas.ModeloResponse])
 def list_modelos(
@@ -130,7 +137,8 @@ def list_modelos_admin(
         )
         .join(models.Marca, models.Modelo.marca_id == models.Marca.id)
         .join(models.TipoDispositivo, models.Modelo.tipo_id == models.TipoDispositivo.id)
-)
+    )
+
     if tipo_id:
         query = query.filter(models.Modelo.tipo_id == tipo_id)
 
@@ -138,6 +146,7 @@ def list_modelos_admin(
         query = query.filter(models.Modelo.marca_id == marca_id)
 
     return query.order_by(models.Modelo.nome).all()
+
 
 @app.get("/admin/marcas")
 def list_marcas_admin(
