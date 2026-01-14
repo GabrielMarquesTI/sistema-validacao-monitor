@@ -11,7 +11,7 @@ export interface Marca {
 export interface ModeloAdmin {
   
   id: number;
-  nome: string;
+  modelo: string;
   marca: string;
   tipo: string;
   tamanho_polegadas?: number | null;

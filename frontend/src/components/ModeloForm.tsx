@@ -5,12 +5,12 @@ const TIPO_MONITOR_ID = 1;
 
 interface Tipo {
   id: number;
-  nome: string;
+  modelo: string;
 }
 
 interface Marca {
   id: number;
-  nome: string;
+  modelo: string;
 }
 
 interface ModeloFormProps {
@@ -24,7 +24,7 @@ export default function ModeloForm({
   onCancel,
   modeloParaEditar,
 }: ModeloFormProps) {
-  const [nome, setNome] = useState("");
+  const [modelo, setModelo] = useState("");
   const [tipoId, setTipoId] = useState<number | undefined>();
   const [marcaId, setMarcaId] = useState<number | undefined>();
   const [tamanho, setTamanho] = useState<number | undefined>();
@@ -43,7 +43,7 @@ export default function ModeloForm({
   // 🔹 Preenche formulário ao editar
   useEffect(() => {
     if (modeloParaEditar) {
-      setNome(modeloParaEditar.modelo);
+      setModelo(modeloParaEditar.modelo);
       setTipoId(modeloParaEditar.tipo_id);
       setMarcaId(modeloParaEditar.marca_id);
       setTamanho(modeloParaEditar.tamanho_polegadas ?? undefined);
@@ -63,7 +63,7 @@ export default function ModeloForm({
   const ehMonitor = tipoId === TIPO_MONITOR_ID;
 
   async function salvar() {
-    if (!nome || !tipoId || !marcaId) {
+    if (!modelo || !tipoId || !marcaId) {
       alert("Preencha todos os campos obrigatórios");
       return;
     }
@@ -84,7 +84,7 @@ export default function ModeloForm({
 
     // ✅ payload correto
     const payload: any = {
-      modelo: nome,
+      modelo: modelo,
       tipo_id: tipoId,
       marca_id: marcaId,
     };
@@ -102,7 +102,7 @@ export default function ModeloForm({
         await api.post("/modelos", payload);
       }
 
-      setNome("");
+      setModelo("");
       setTipoId(undefined);
       setMarcaId(undefined);
       setTamanho(undefined);
@@ -127,8 +127,8 @@ export default function ModeloForm({
 
       <input
         placeholder="Nome do modelo"
-        value={nome}
-        onChange={(e) => setNome(e.target.value)}
+        value={modelo}
+        onChange={(e) => setModelo(e.target.value)}
       />
 
       <select
@@ -140,7 +140,7 @@ export default function ModeloForm({
         <option value="">Selecione o tipo</option>
         {tipos.map((tipo) => (
           <option key={tipo.id} value={tipo.id}>
-            {tipo.nome}
+            {tipo.modelo}
           </option>
         ))}
       </select>
@@ -154,7 +154,7 @@ export default function ModeloForm({
         <option value="">Selecione a marca</option>
         {marcas.map((marca) => (
           <option key={marca.id} value={marca.id}>
-            {marca.nome}
+            {marca.modelo}
           </option>
         ))}
       </select>

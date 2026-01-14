@@ -3,7 +3,7 @@ import {type ModeloAdmin } from "../types";
 interface ModeloTableProps {
   modelos: ModeloAdmin[];
   onEdit: (modelo: ModeloAdmin) => void;
-  onDelete: (modelo: ModeloAdmin) => void,
+  onDelete: (modelo: ModeloAdmin) => void;
 }
 
 export default function ModeloTable({ modelos, onEdit, onDelete }: ModeloTableProps) {

@@ -3,12 +3,12 @@ import { api } from "../api/api";
 
 interface Tipo {
   id: number;
-  nome: string;
+  modelo: string;
 }
 
 interface Marca {
   id: number;
-  nome: string;
+  modelo: string;
 }
 
 interface FiltrosProps {
@@ -59,7 +59,7 @@ export default function Filtros({ onFiltrar }: FiltrosProps) {
         <option value="">Todos os tipos</option>
         {tipos.map((tipo) => (
           <option key={tipo.id} value={tipo.id}>
-            {tipo.nome}
+            {String(tipo.modelo)}
           </option>
         ))}
       </select>
@@ -74,7 +74,7 @@ export default function Filtros({ onFiltrar }: FiltrosProps) {
         <option value="">Todas as marcas</option>
         {marcas.map((marca) => (
           <option key={marca.id} value={marca.id}>
-            {marca.nome}
+            {String(marca.modelo)}
           </option>
         ))}
       </select>
